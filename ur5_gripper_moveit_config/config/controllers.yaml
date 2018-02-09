@@ -1,5 +1,5 @@
 controller_list:
-  - name: manipulator_controller
+  - name: ""
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     joints:
@@ -10,8 +10,12 @@ controller_list:
       - wrist_2_joint
       - wrist_3_joint
   - name: endeffector_controller
+    action_ns: gripper_action
+    type: GripperCommand
+    default: true
     joints:
-      []
+      - finger_joint
+
 
 initial:
   - group: manipulator
