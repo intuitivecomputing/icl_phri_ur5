@@ -9,12 +9,12 @@ controller_list:
       - wrist_1_joint
       - wrist_2_joint
       - wrist_3_joint
-  - name: endeffector_controller
-    action_ns: gripper_action
-    type: GripperCommand
-    default: true
-    joints:
-      - finger_joint
+#  - name: endeffector_controller
+#    action_ns: gripper_action
+#    type: GripperCommand
+#    default: true
+#    joints:
+#      - finger_joint
 
 
 initial:

@@ -8,7 +8,7 @@
 
   <!-- Launch moveit -->
   <include file="$(find ur5_gripper_moveit_config)/launch/move_group.launch">
-    <!--arg name="limited" default="$(arg limited)"/-->
+    <arg name="limited" default="$(arg limited)"/>
     <arg name="debug" default="$(arg debug)" />
   </include>
 </launch>

@@ -16,7 +16,7 @@ if __name__=='__main__':
     scene = PlanningSceneInterface()
     robot = RobotCommander()
     arm = MoveGroupCommander("manipulator")
-    #gripper = MoveGroupCommander("end_effector")
+    gripper = MoveGroupCommander("end_effector")
     rospy.sleep(1)
 
     # clean the scene
@@ -26,8 +26,8 @@ if __name__=='__main__':
     arm.set_named_target("up")
     arm.go()
     
-    #gripper.set_named_target("open")
-    #gripper.go()
+    gripper.set_named_target("open")
+    gripper.go()
     
     rospy.sleep(1)
 
@@ -63,8 +63,8 @@ if __name__=='__main__':
     grasp_pose.pose.orientation.z = 0.0164031
     grasp_pose.pose.orientation.w = 0.704779
     
-    right_arm.set_pose_target(grasp_pose)
-    right_arm.go()
+    arm.set_pose_target(grasp_pose)
+    arm.go()
     
     rospy.sleep(2)
     
@@ -115,7 +115,7 @@ if __name__=='__main__':
     rospy.sleep(2)
 
     # pick the object
-    robot.right_arm.pick("part", grasps)
+    robot.arm.pick("part", grasps)
 
     rospy.spin()
     roscpp_shutdown()
