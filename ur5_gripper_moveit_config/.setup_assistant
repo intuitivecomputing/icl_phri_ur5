@@ -1,10 +1,10 @@
 moveit_setup_assistant_config:
   URDF:
     package: ur5_robotiq_arg140_description
-    relative_path: robots/ur5_robotiq_140_.xacro
+    relative_path: robots/ur5_robotiq_140.xacro
   SRDF:
     relative_path: config/ur5_gripper.srdf
   CONFIG:
     author_name: Yuxiang Gao
     author_email: ygao73@jhu.edu
-    generated_timestamp: 1518043633
+    generated_timestamp: 1518206526
