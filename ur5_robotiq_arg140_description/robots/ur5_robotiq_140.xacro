@@ -10,17 +10,25 @@
     <xacro:ur5_robot prefix="${prefix}" joint_limited="false" />
     <!-- gripper -->
     <xacro:robotiq_arg2f_140 prefix="${prefix}" />
-    <link name="${prefix}world" />
-    <joint name="world-robot_base" type="fixed">
-      <parent link= "${prefix}world" />
+    <!--dummy link-->
+    <link name="${prefix}fixed_link" />
+    <joint name="fixed_link-robot_base" type="fixed">
+      <parent link= "${prefix}fixed_link" />
       <child link = "${prefix}base_link" />
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
     </joint>
 
-    <joint name="ur5_tool0-gripper_base" type="fixed">
-      <parent link= "${prefix}tool0" />
+    <joint name="ur5_ee_link-gripper_base" type="fixed">
+      <parent link= "${prefix}ee_link" />
       <child link = "${prefix}robotiq_arg2f_base_link" />
-      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <origin xyz=" 0.04 0.0 0.0" rpy="0.0 ${pi/2} 0.0" />
+    </joint>
+
+    <link name="${prefix}tool" />
+    <joint name="tool_tip" type="fixed">
+      <parent link= "${prefix}ee_link" />
+      <child link = "${prefix}tool" />
+      <origin xyz=" 0.00 0.0 0.1" rpy="0.0 0.0 0.0" />
     </joint>
   </xacro:macro>
 
