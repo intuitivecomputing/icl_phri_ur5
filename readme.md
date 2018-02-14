@@ -5,11 +5,14 @@
 
 ### Launch moveit scence:
 `roslaunch ur5_gripper_moveit_config ur5_gripper_moveit_planning_execution.launch limited:=true`
+
 `roslaunch ur5_gripper_moveit_config moveit_rviz.launch config:=true`
 
 ### Launch gripper node
 `rosrun robotiq_c_model_control CModelRtuNode.py /dev/ttyUSB1`
+
 `rosrun robotiq_c_model_control CModelSimpleController.py`
+
 `rosrun robotiq_c_model_control CModelStatusListener.py`
 
 ### Launch force torque sensor
