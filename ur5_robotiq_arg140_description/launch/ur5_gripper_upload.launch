@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-  <arg name="limited" default="false"/>
-
-  <param unless="$(arg limited)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find ur5_robotiq_arg140_description)/robots/ur5_robotiq_140.xacro'" />
-  <param if="$(arg limited)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find ur5_robotiq_arg140_description)/robots/ur5_robotiq_140_joint_limited.xacro'" />
-</launch>
-

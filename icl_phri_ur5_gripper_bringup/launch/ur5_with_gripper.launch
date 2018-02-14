@@ -1,0 +1,23 @@
+<launch>
+    <arg name="limited" value="true" />
+    <arg name="gripper_port" value="/dev/ttyUSB1" />
+    <arg name="sensor_port" value="ttyUSB0" />
+
+    <!--UR5 bringup-->
+    <include file="$(find icl_phri_ur5_gripper_bringup)/launch/ur5_bringup.launch">
+        <arg name="robot_ip" value="192.168.1.129" />
+        <arg name="limited" value="$(arg limited)" />
+        <arg name="with_gripper" value="true" />
+    </include>
+
+    <!--robotiq gripper and sensor bringup-->
+    <include file="$(find icl_phri_ur5_gripper_bringup)/launch/robotiq_bringup.launch">
+        <!--arg name="gripper_port" value="/dev/ttyUSB1" />
+        <arg name="sensor_port" value="ttyUSB0" /-->
+    </include>
+
+    <!--moveit bringup-->
+    <include file="$(find icl_phri_ur5_gripper_bringup)/launch/moveit_bringup.launch">
+        <!--arg name="limited" value="$(arg limited)" /-->
+    </include>
+</launch>
