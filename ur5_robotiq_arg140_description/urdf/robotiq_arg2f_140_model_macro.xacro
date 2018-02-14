@@ -157,8 +157,6 @@
     </joint>
   </xacro:macro>
 
-  <xacro:include filename="$(find ur5_robotiq_arg140_description)/urdf/robotiq_arg2f.xacro" />
-
   <xacro:macro name="finger_joint" params="prefix">
     <joint name="${prefix}finger_joint" type="revolute">
       <origin xyz="0 -0.030601 0.054905" rpy="${pi / 2 + .725} 0 0" />
@@ -181,6 +179,50 @@
     </joint>
     <xacro:finger_joints prefix="${prefix}" fingerprefix="right" reflect="-1.0"/>
   </xacro:macro>
+
+  <!--finger tip-->
+  <xacro:macro name="finger_tip" params="prefix fingerprefix stroke">
+    <link name="${prefix}${fingerprefix}_finger_tip">
+      <inertial>
+        <origin xyz="0.000299999999999317 0.0160078233491243 -0.0136945669206257" rpy="0 0 0" />
+        <mass value="0.0104003125914103" />
+        <inertia
+            ixx="2.71909453810972E-06"
+            ixy="0.0"
+            ixz="0.0"
+            iyy="7.69100314106116E-07"
+            iyz="0.0"
+            izz="2.30315190420171E-06" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://ur5_robotiq_arg140_description/meshes/robotiq_arg2f_${stroke}_finger_tip.dae" />
+        </geometry>
+        <material name="">
+          <color rgba="0.1 0.1 0.1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://ur5_robotiq_arg140_description/meshes/robotiq_arg2f_${stroke}_finger_tip.dae" />
+        </geometry>
+      </collision>
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="finger_tip_joint" params="prefix fingerprefix">
+    <joint name="${prefix}${fingerprefix}_finger_tip_joint" type="fixed">
+      <origin xyz="0 0.01821998610742 0.0260018192872234" rpy="0 0 0" />
+      <parent link="${prefix}${fingerprefix}_inner_finger" />
+      <child link="${prefix}${fingerprefix}_finger_tip" />
+      <axis xyz="1 0 0" />
+    </joint>
+  </xacro:macro>
+
+    <!--Import robotiq desciptions-->
+  <xacro:include filename="$(find ur5_robotiq_arg140_description)/urdf/robotiq_arg2f.xacro" />
 
   <xacro:macro name="robotiq_arg2f_140" params="prefix">
     <xacro:robotiq_arg2f_base_link prefix="${prefix}"/>
