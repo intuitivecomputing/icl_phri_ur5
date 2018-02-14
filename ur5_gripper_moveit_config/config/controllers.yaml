@@ -17,6 +17,6 @@ controller_list:
 #      - finger_joint
 
 
-initial:
-  - group: manipulator
-    pose:  up
+#initial:
+#  - group: manipulator
+#    pose:  up

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import copy
 import rospy
 from moveit_commander import RobotCommander, MoveGroupCommander
 from moveit_commander import PlanningSceneInterface, roscpp_initialize, roscpp_shutdown
