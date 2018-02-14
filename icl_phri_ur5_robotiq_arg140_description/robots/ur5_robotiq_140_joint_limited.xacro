@@ -4,6 +4,7 @@
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
   <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
   <xacro:include filename="$(find icl_phri_ur5_robotiq_arg140_description)/urdf/robotiq_arg2f_140_model_macro.xacro" />
+  <xacro:include filename="$(find robotiq_force_torque_sensor)/urdf/robotiq_fts300.urdf.xacro" />
   
   <xacro:macro name="ur5_with_gripper_joint_limited" params="prefix">
     <!-- arm -->
@@ -25,11 +26,17 @@
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
     </joint>
 
+    <!--force torque sensor-->
+    <xacro:robotiq_fts150 prefix="" parent="ee_link" >
+      <origin xyz="0 0 0" rpy="0 1.57 0"/>
+    </xacro:robotiq_fts150>
+
     <joint name="ur5_ee_link-gripper_base" type="fixed">
-      <parent link= "${prefix}ee_link" />
+      <parent link= "${prefix}fts_toolside" />
       <child link = "${prefix}robotiq_arg2f_base_link" />
-      <origin xyz=" 0.04 0.0 0.0" rpy="0.0 ${pi/2} 0.0" />
+      <origin xyz=" 0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
     </joint>
+
     <link name="${prefix}tool" />
     <joint name="tool_tip" type="fixed">
       <parent link= "${prefix}ee_link" />
