@@ -18,14 +18,16 @@ class QueueSetLength:
     "A container with a first-in-first-out (FIFO) queuing policy with a set length."
 
     def __init__(self, length):
-        self._list = []
+        self._list = np.zeros(6)
         self._length = length
 
     def push(self, data):
         "Enqueue the 'item' into the queue"
+        print(self._list)
         self._list = np.vstack( ( data, self._list ) )
         if self._list.shape[0] > self._length:
-            self._list.pop()
+            self.pop()
+        
         return self._list
 
     def pop(self):
@@ -58,11 +60,12 @@ class AverageFilter:
         force = vector3_to_numpy(wrench_stamped.wrench.force)
         torque = vector3_to_numpy(wrench_stamped.wrench.torque)
         data = np.hstack( (force, torque ) )
+        
         self._queue.push(data)
         filtered = self._queue.average()
         self._filtered_pub.publish(array_to_wrench_stamped(header, data))
 
 
 if __name__ == '__main__':
-    AverageFilter()
+    AverageFilter(50)
     

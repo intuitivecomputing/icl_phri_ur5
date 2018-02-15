@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+from __future__ import division, print_function
 import numpy as np
 from time import sleep
-from __future__ import division, print_function
+
 
 import rospy
 from std_msgs.msg import String, Header
@@ -40,7 +41,7 @@ class RobotiqGripperCtrl:
 
     def query_callback(self, input):
         print("callback")
-        print self.query.gSTA
+        print(self.query.gSTA)
         self.query = input
         self.activated = True if self.query.gSTA == 1 else False
 
@@ -63,7 +64,7 @@ class RobotiqGripperCtrl:
 
     def activate(self):
         # if not self.activated:
-        print 'activate'
+        print('activate')
         self.command = outputMsg.CModel_robot_output()
         self.command.rACT = 1
         self.command.rGTO = 1

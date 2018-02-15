@@ -7,12 +7,12 @@ def vector3_to_numpy(vect):
 
 def array_to_wrench(array):
     msg = Wrench()
-    msg.wrench.force.x = array[0]
-    msg.wrench.force.y = array[1]
-    msg.wrench.force.z = array[2]
-    msg.wrench.torque.x = array[3]
-    msg.wrench.torque.y = array[4]
-    msg.wrench.torque.z = array[5]
+    msg.force.x = array[0]
+    msg.force.y = array[1]
+    msg.force.z = array[2]
+    msg.torque.x = array[3]
+    msg.torque.y = array[4]
+    msg.torque.z = array[5]
     return msg
 
 def array_to_wrench_stamped(header, array):
