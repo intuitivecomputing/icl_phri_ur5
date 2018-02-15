@@ -3,5 +3,6 @@
         "/home/intuitive_computing/catkin_ws/devel/lib/python2.7/dist-packages",
         "/opt/ros/kinetic/lib/python2.7/dist-packages"
     ],
-    "python.formatting.provider": "autopep8"
+    "python.formatting.provider": "autopep8",
+    "python.pythonPath": "/Users/davidgogh/.pyenv/versions/anaconda2-4.4.0/envs/anaconda2/bin/python"
 }

@@ -10,6 +10,8 @@ from geometry_msgs.msg import WrenchStamped, Vector3
 from robotiq_c_model_control.msg import _CModel_robot_output as outputMsg
 from robotiq_c_model_control.msg import _CModel_robot_input as inputMsg
 
+from utils import vector3_to_numpy
+
 
 class RobotiqGripperCtrl:
     def __init__(self):
@@ -111,9 +113,6 @@ def norm(vect):
 #         self.mag = norm(vect)
 #         self.dir = np.arrary([vect.x, vect.y, vect.z]) / self.mag
 
-
-def vector3_to_numpy(vect):
-    return np.array([vect.x, vect.y, vect.z])
 
 
 class ForceTorqueSensor:
