@@ -20,4 +20,7 @@
     <include file="$(find icl_phri_ur5_gripper_bringup)/launch/moveit_bringup.launch">
         <!--arg name="limited" value="$(arg limited)" /-->
     </include>
+    
+    <node name="joint_state_republisher" pkg="icl_phri_ur5_gripper_bringup" type="gripper_joint_state_publisher.py"/>
+
 </launch>

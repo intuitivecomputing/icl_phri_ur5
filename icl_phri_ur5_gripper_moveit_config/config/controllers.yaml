@@ -1,7 +1,8 @@
 controller_list:
-  - name: ""
+  - name: icl_phri
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
+    default: true
     joints:
       - shoulder_pan_joint
       - shoulder_lift_joint
@@ -9,12 +10,12 @@ controller_list:
       - wrist_1_joint
       - wrist_2_joint
       - wrist_3_joint
-#  - name: endeffector_controller
-#    action_ns: gripper_action
-#    type: GripperCommand
-#    default: true
-#    joints:
-#      - finger_joint
+  - name: ""
+    action_ns: gripper_controller
+    type: GripperCommand
+    default: true
+    joints:
+      - finger_joint
 
 
 #initial:
