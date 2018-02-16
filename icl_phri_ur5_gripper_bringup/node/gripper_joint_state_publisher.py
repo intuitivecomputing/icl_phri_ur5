@@ -6,11 +6,14 @@ import message_filters
 from robotiq_c_model_control.msg import _CModel_robot_input  as inputMsg
 
 class FullState:
-    def __init__(self, ns="icl_phri"):
+    def __init__(self):
         rospy.init_node('joint_state_republisher', anonymous=True)
-        joint_states_sub = message_filters.Subscriber(ns + '/joint_states', JointState)
-        gripper_sub = message_filters.Subscriber('CModelRobotInput', inputMsg.CModel_robot_input)
-        self._ts = message_filters.ApproximateTimeSynchronizer([joint_states_sub, gripper_sub], 10, 0.1, allow_headerless=True)
+        manipulator_ns = rospy.get_param("~manipulator_ns", "icl_phri_ur5")
+        gripper_ns = rospy.get_param("~gripper_ns", "icl_phri_gripper")
+        fts_input = rospy.get_param("~fts_input", "CModelRobotInput")
+        joint_states_sub = message_filters.Subscriber(manipulator_ns + '/' + 'joint_states', JointState)
+        fts_sub = message_filters.Subscriber(gripper_ns + '/' + fts_input, inputMsg.CModel_robot_input)
+        self._ts = message_filters.ApproximateTimeSynchronizer([joint_states_sub, fts_sub], 10, 0.1, allow_headerless=True)
         self._ts.registerCallback(self._joint_states_callback)
         self._joint_states_pub = rospy.Publisher('joint_states', JointState, queue_size=1)
         rospy.spin()
@@ -26,7 +29,7 @@ class FullState:
         msg.velocity.append(0.0)
         msg.effort = list(ur5_joints.effort)
         msg.effort.append(gripper_joint.gCU)
-        print msg
+        # print msg
         self._joint_states_pub.publish(msg)
 
         

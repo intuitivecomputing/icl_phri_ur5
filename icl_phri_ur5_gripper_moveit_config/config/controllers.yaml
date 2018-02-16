@@ -1,5 +1,5 @@
 controller_list:
-  - name: icl_phri
+  - name: icl_phri_ur5
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: true
@@ -10,7 +10,7 @@ controller_list:
       - wrist_1_joint
       - wrist_2_joint
       - wrist_3_joint
-  - name: ""
+  - name: icl_phri_gripper
     action_ns: gripper_controller
     type: GripperCommand
     default: true

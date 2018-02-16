@@ -24,7 +24,7 @@
   </include>
   
   <!-- ur common -->
-  <include ns="icl_phri" file="$(find ur_modern_driver)/launch/ur_common.launch">
+  <include ns="icl_phri_ur5" file="$(find ur_modern_driver)/launch/ur_common.launch">
     <arg name="prefix"  value="$(arg prefix)" />
     <arg name="robot_ip" value="$(arg robot_ip)"/>
     <arg name="min_payload"  value="$(arg min_payload)"/>

@@ -11,7 +11,7 @@
     </include>
 
     <!--robotiq gripper and sensor bringup-->
-    <include file="$(find icl_phri_ur5_gripper_bringup)/launch/robotiq_bringup.launch">
+    <include ns="icl_phri_gripper" file="$(find icl_phri_ur5_gripper_bringup)/launch/robotiq_bringup.launch">
         <!--arg name="gripper_port" value="/dev/ttyUSB1" />
         <arg name="sensor_port" value="ttyUSB0" /-->
     </include>
