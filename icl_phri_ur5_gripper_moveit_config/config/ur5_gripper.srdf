@@ -10,7 +10,7 @@
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
     <group name="manipulator">
-        <chain base_link="base_link" tip_link="ee_link" />
+        <chain base_link="base_link" tip_link="fts_toolside" />
     </group>
     <group name="end_effector">
         <joint name="finger_joint" />
@@ -35,7 +35,7 @@
         <joint name="wrist_3_joint" value="0" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="robotiq_140" parent_link="ee_link" group="end_effector" parent_group="manipulator" />
+    <end_effector name="robotiq_140" parent_link="fts_toolside" group="end_effector" parent_group="manipulator" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="fixed_base" type="fixed" parent_frame="world" child_link="fixed_link" />
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
