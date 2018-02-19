@@ -13,7 +13,7 @@ controller_list:
   - name: icl_phri_gripper
     action_ns: gripper_controller
     type: GripperCommand
-    default: true
+    default: false
     joints:
       - finger_joint
 

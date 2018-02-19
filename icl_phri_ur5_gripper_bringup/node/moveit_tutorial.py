@@ -41,6 +41,7 @@
 import sys
 import copy
 import rospy
+from tf.transformations import quaternion_from_euler
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
@@ -113,10 +114,11 @@ def move_group_python_interface_tutorial():
   ## end-effector
   print "============ Generating plan 1"
   pose_target = geometry_msgs.msg.Pose()
-  pose_target.orientation.w = 1.0
-  pose_target.position.x = 0.7
-  pose_target.position.y = -0.05
-  pose_target.position.z = 1.1
+  # pose_target.orientation = geometry_msgs.msg.Quaternion(*quaternion_from_euler(-1.160, 0, 3.009))
+  pose_target.orientation = geometry_msgs.msg.Quaternion(0.738, 0.671, -0.069, 0.032)
+  pose_target.position.x = -0.162
+  pose_target.position.y = -0.534
+  pose_target.position.z = 0.462
   group.set_pose_target(pose_target)
 
   ## Now, we call the planner to compute the plan
@@ -163,67 +165,76 @@ def move_group_python_interface_tutorial():
   ## Let's set a joint space goal and move towards it. 
   ## First, we will clear the pose target we had just set.
 
-  group.clear_pose_targets()
+  # group.clear_pose_targets()
 
-  ## Then, we will get the current set of joint values for the group
-  group_variable_values = group.get_current_joint_values()
-  print "============ Joint values: ", group_variable_values
+  # ## Then, we will get the current set of joint values for the group
+  # group_variable_values = group.get_current_joint_values()
+  # print "============ Joint values: ", group_variable_values
 
-  ## Now, let's modify one of the joints, plan to the new joint
-  ## space goal and visualize the plan
-  group_variable_values[0] = 1.0
-  group.set_joint_value_target(group_variable_values)
+  # ## Now, let's modify one of the joints, plan to the new joint
+  # ## space goal and visualize the plan
+  # group_variable_values[0] = 1.0
+  # group.set_joint_value_target(group_variable_values)
 
-  plan2 = group.plan()
+  # plan2 = group.plan()
 
-  print "============ Waiting while RVIZ displays plan2..."
-  rospy.sleep(5)
+  # print "============ Waiting while RVIZ displays plan2..."
+  # rospy.sleep(5)
 
 
-  ## Cartesian Paths
-  ## ^^^^^^^^^^^^^^^
-  ## You can plan a cartesian path directly by specifying a list of waypoints 
-  ## for the end-effector to go through.
-  waypoints = []
+  # ## Cartesian Paths
+  # ## ^^^^^^^^^^^^^^^
+  # ## You can plan a cartesian path directly by specifying a list of waypoints 
+  # ## for the end-effector to go through.
+  # waypoints = []
 
-  # start with the current pose
-  waypoints.append(group.get_current_pose().pose)
+  # # start with the current pose
+  # waypoints.append(group.get_current_pose().pose)
 
-  # first orient gripper and move forward (+x)
-  wpose = geometry_msgs.msg.Pose()
-  wpose.orientation.w = 1.0
-  wpose.position.x = waypoints[0].position.x + 0.1
-  wpose.position.y = waypoints[0].position.y
-  wpose.position.z = waypoints[0].position.z
-  waypoints.append(copy.deepcopy(wpose))
+  # # first orient gripper and move forward (+x)
+  # wpose = geometry_msgs.msg.Pose()
+  # wpose.orientation.w = 1.0
+  # wpose.position.x = waypoints[0].position.x + 0.1
+  # wpose.position.y = waypoints[0].position.y
+  # wpose.position.z = waypoints[0].position.z
+  # waypoints.append(copy.deepcopy(wpose))
 
-  # second move down
-  wpose.position.z -= 0.10
-  waypoints.append(copy.deepcopy(wpose))
+  # # second move down
+  # wpose.position.z -= 0.10
+  # waypoints.append(copy.deepcopy(wpose))
 
-  # third move to the side
-  wpose.position.y += 0.05
-  waypoints.append(copy.deepcopy(wpose))
+  # # third move to the side
+  # wpose.position.y += 0.05
+  # waypoints.append(copy.deepcopy(wpose))
 
-  ## We want the cartesian path to be interpolated at a resolution of 1 cm
-  ## which is why we will specify 0.01 as the eef_step in cartesian
-  ## translation.  We will specify the jump threshold as 0.0, effectively
-  ## disabling it.
-  (plan3, fraction) = group.compute_cartesian_path(
-                               waypoints,   # waypoints to follow
-                               0.01,        # eef_step
-                               0.0)         # jump_threshold
+  # ## We want the cartesian path to be interpolated at a resolution of 1 cm
+  # ## which is why we will specify 0.01 as the eef_step in cartesian
+  # ## translation.  We will specify the jump threshold as 0.0, effectively
+  # ## disabling it.
+  # (plan3, fraction) = group.compute_cartesian_path(
+  #                              waypoints,   # waypoints to follow
+  #                              0.01,        # eef_step
+  #                              0.0)         # jump_threshold
                                
-  print "============ Waiting while RVIZ displays plan3..."
-  rospy.sleep(5)
+  # print "============ Waiting while RVIZ displays plan3..."
+  # rospy.sleep(5)
 
- 
-  ## Adding/Removing Objects and Attaching/Detaching Objects
-  ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  ## First, we will define the collision object message
-  collision_object = moveit_msgs.msg.CollisionObject()
+  # ## Adding/Removing Objects and Attaching/Detaching Objects
+  # ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  # ## First, we will define the collision object message
+  # collision_object = moveit_msgs.msg.CollisionObject()
 
+  # collision_object_pub = rospy.Publisher('/collision_object', moveit_msgs.msg.CollisionObject, queue_size=1)
+  # desk_collision_object_msg = moveit_msgs.msg.CollisionObject()
+  # desk_collision_object_msg.operation = desk_collision_object_msg.MOVE
 
+  # desk_collision_object_msg.meshes = []
+  # desk_collision_object_msg.id = 'desk'
+  # desk_collision_object_msg.mesh_poses = [desk_pose]
+  # desk_collision_object_msg.header.stamp = rospy.Time.now()
+  # dsk_collision_object_msg.header.frame_id = base_frame_id
+
+  # collision_object_pub.publish(desk_collision_object_msg)
 
   ## When finished shut down moveit_commander.
   moveit_commander.roscpp_shutdown()
