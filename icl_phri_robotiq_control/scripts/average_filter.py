@@ -23,7 +23,7 @@ class QueueSetLength:
 
     def push(self, data):
         "Enqueue the 'item' into the queue"
-        print(self._list)
+        # print(self._list)
         self._list = np.vstack( ( data, self._list ) )
         if self._list.shape[0] > self._length:
             self.pop()
@@ -49,6 +49,7 @@ class QueueSetLength:
 class AverageFilter:
     def __init__(self, window_size=10, topic_name='robotiq_force_torque_wrench'):
         rospy.init_node('average_filter', anonymous=True)
+        rospy.get_param("~window_size", 10)
         self._fts_sub = rospy.Subscriber(
             topic_name, WrenchStamped, self._fts_callback)
         self._filtered_pub = rospy.Publisher('out', WrenchStamped, queue_size=1)
@@ -63,9 +64,9 @@ class AverageFilter:
         
         self._queue.push(data)
         filtered = self._queue.average()
-        self._filtered_pub.publish(array_to_wrench_stamped(header, data))
+        self._filtered_pub.publish(array_to_wrench_stamped(header, filtered))
 
 
 if __name__ == '__main__':
-    AverageFilter(50)
+    AverageFilter()
     

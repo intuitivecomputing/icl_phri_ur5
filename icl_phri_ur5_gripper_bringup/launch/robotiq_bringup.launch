@@ -1,15 +1,18 @@
 <launch>
-  <arg name="gripper_port" value="/dev/ttyUSB1" />
-  <arg name="sensor_port" value="ttyUSB0" />
+    <arg name="gripper_port" value="/dev/ttyUSB1" />
+    <arg name="sensor_port" value="ttyUSB0" />
 
-  <!--gripper bringup-->
-  <node name="gripper_node" pkg="robotiq_c_model_control" type="CModelRtuNode.py" args="$(arg gripper_port)" />
+    <!--gripper bringup-->
+    <node name="gripper_node" pkg="robotiq_c_model_control" type="CModelRtuNode.py" args="$(arg gripper_port)" />
 
-  <!--force torque sensor bringup-->
-  <node name="sensor_node" pkg="robotiq_force_torque_sensor" type="rq_sensor" >
-    <param name="serial_id" value="$(arg sensor_port)" />
-  </node>
-  
+    <!--force torque sensor bringup-->
+    <node name="sensor_node" pkg="robotiq_force_torque_sensor" type="rq_sensor" >
+        <param name="serial_id" value="$(arg sensor_port)" />
+    </node>
+    <node name="avg_fil" pkg="icl_phri_robotiq_control" type="average_filter.py">
+        <remap from ="out" to="wrench_filtered" />
+        <param name="~window_size" value="120" />
+    </node>
     <!--moveit bringup-->
     <include file="$(find robotiq_action_server)/launch/robotiq_c_model_action_server.launch">
         <!--arg name="limited" value="$(arg limited)" /-->
