@@ -4,7 +4,7 @@
   <xacro:include filename="$(find icl_phri_ur5_robotiq_arg140_description)/robots/robotiq_arg140.transmission.xacro" />
  <!-- base -->
   <joint name="${parent}_${name}_base_joint" type="fixed">
-    <insert_block name="origin"/>
+    <xacro:insert_block name="origin"/>
     <parent link="${parent}"/>
     <child link="${name}_base"/>
   </joint>
