@@ -115,10 +115,13 @@ def move_group_python_interface_tutorial():
   print "============ Generating plan 1"
   pose_target = geometry_msgs.msg.Pose()
   # pose_target.orientation = geometry_msgs.msg.Quaternion(*quaternion_from_euler(-1.160, 0, 3.009))
-  pose_target.orientation = geometry_msgs.msg.Quaternion(0.738, 0.671, -0.069, 0.032)
-  pose_target.position.x = -0.162
-  pose_target.position.y = -0.534
-  pose_target.position.z = 0.462
+  pose_target.orientation = geometry_msgs.msg.Quaternion(0.707, 0, 0, 0.707)
+  pose_target.position.x = 0.143656953384
+  pose_target.position.y = -0.557152625839
+  pose_target.position.z = 0.834501346869 - 0.1
+  # pose_target = group.get_current_pose().pose
+  # print(pose_target)
+  # pose_target.position.x += 0.1
   group.set_pose_target(pose_target)
 
   ## Now, we call the planner to compute the plan
@@ -157,7 +160,7 @@ def move_group_python_interface_tutorial():
   ## and report success on execution of a trajectory.
 
   # Uncomment below line when working with a real robot
-  # group.go(wait=True)
+  group.go(wait=True)
 
   ## Planning to a joint-space goal 
   ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
