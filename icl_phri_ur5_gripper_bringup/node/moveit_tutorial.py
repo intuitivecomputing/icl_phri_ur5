@@ -118,7 +118,7 @@ def move_group_python_interface_tutorial():
   pose_target.orientation = geometry_msgs.msg.Quaternion(0.707, 0, 0, 0.707)
   pose_target.position.x = 0.143656953384
   pose_target.position.y = -0.557152625839
-  pose_target.position.z = 0.834501346869 - 0.1
+  pose_target.position.z = 0.834501346869
   # pose_target = group.get_current_pose().pose
   # print(pose_target)
   # pose_target.position.x += 0.1
