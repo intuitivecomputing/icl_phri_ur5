@@ -32,13 +32,13 @@ class MoveGroup:
         ## arm.
         self._group = moveit_commander.MoveGroupCommander("manipulator")
 
-        self.pose_target = geometry_msgs.msg.Pose()
+        # self.pose_target = geometry_msgs.msg.Pose()
         ## We create this DisplayTrajectory publisher which is used below to publish
         ## trajectories for RVIZ to visualize.
-        self._display_trajectory_publisher = rospy.Publisher(
-                                            '/move_group/display_planned_path',
-                                            moveit_msgs.msg.DisplayTrajectory, 
-                                            queue_size=1)
+        # self._display_trajectory_publisher = rospy.Publisher(
+        #                                     '/move_group/display_planned_path',
+        #                                     moveit_msgs.msg.DisplayTrajectory, 
+        #                                     queue_size=1)
 
         ## Wait for RVIZ to initialize. This sleep is ONLY to allow Rviz to come up.
         print("============ Waiting for RVIZ...")
@@ -73,50 +73,12 @@ class MoveGroup:
     #     self.pose_target.position.y = pose_array[1]
     #     self.pose_target.position.z = pose_array[2]
 
-    def update_pose_target(self):
-        self.pose_target = self.get_pose()
+    # def update_pose_target(self):
+    #     self.pose_target = self.get_pose()
 
     def plan_move(self):
-        ## Planning to a Pose goal
-        ## ^^^^^^^^^^^^^^^^^^^^^^^
-        ## We can plan a motion for this group to a desired pose for the 
-        ## end-effector
-        print("============ Generating plan 1")
-        ## Now, we call the planner to compute the plan
-        ## and visualize it if successful
-        ## Note that we are just planning, not asking move_group 
-        ## to actually move the robot
-        #self._group.set_pose_target(self.pose_target)
+        print("============ Generating plan")
         self.plan = self._group.plan()
-
-        # print("============ Waiting while RVIZ displays plan1...")
-        # rospy.sleep(5)
-
-        # ## You can ask RVIZ to visualize a plan (aka trajectory) for you.  But the
-        # ## group.plan() method does this automatically so this is not that useful
-        # ## here (it just displays the same trajectory again).
-        # print("============ Visualizing plan1")
-        # display_trajectory = moveit_msgs.msg.DisplayTrajectory()
-
-        # display_trajectory.trajectory_start = self.robot.get_current_state()
-        # display_trajectory.trajectory.append(self.plan)
-        # self.display_trajectory_publisher.publish(display_trajectory)
-
-        # print("============ Waiting while plan1 is visualized (again)...")
-        # rospy.sleep(5)
-
-        # Moving to a pose goal
-        # ^^^^^^^^^^^^^^^^^^^^^
-        #
-        # Moving to a pose goal is similar to the step above
-        # except we now use the go() function. Note that
-        # the pose goal we had set earlier is still active 
-        # and so the robot will try to move to that goal. We will
-        # not use that function in this tutorial since it is 
-        # a blocking function and requires a controller to be active
-        # and report success on execution of a trajectory.
-
-        # Uncomment below line when working with a real robot
 
     def go(self):
         self._group.go(wait=True)
@@ -128,13 +90,16 @@ class MoveGroup:
 class NaiveLeveling:
     def __init__(self):
         rospy.init_node('naive_leveling', anonymous=True)
-        r = rospy.Rate(15)
+        # r = rospy.Rate(15)
         self._mg = MoveGroup()
-        self._wrench_sub = rospy.Subscriber('icl_phri_gripper/wrench_filtered', WrenchStamped, self._wrench_callback, queue_size=1)
+        self._wrench_sub = rospy.Subscriber('icl_phri_gripper/wrench_filtered', 
+                                            WrenchStamped, 
+                                            self._wrench_callback, 
+                                            queue_size=1)
         print(self._mg.get_pose())
         self.last_torque = None
         self.diff = 0
-        self._mg.update_pose_target()
+        # self._mg.update_pose_target()
         #r.sleep()
         rospy.spin()
 

@@ -10,7 +10,7 @@ class FullState:
         rospy.init_node('joint_state_republisher', anonymous=True)
         manipulator_ns = rospy.get_param("~manipulator_ns", "icl_phri_ur5")
         gripper_ns = rospy.get_param("~gripper_ns", "icl_phri_gripper")
-        fts_input = rospy.get_param("~fts_input", "CModelRobotInput")
+        fts_input = rospy.get_param("~fts_input", "gripper_controller/input")
         joint_states_sub = message_filters.Subscriber(manipulator_ns + '/' + 'joint_states', JointState)
         fts_sub = message_filters.Subscriber(gripper_ns + '/' + fts_input, inputMsg.CModel_robot_input)
         self._ts = message_filters.ApproximateTimeSynchronizer([joint_states_sub, fts_sub], 10, 0.1, allow_headerless=True)
