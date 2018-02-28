@@ -14,22 +14,9 @@ from utils import *
 
 class MoveGroup:
     def __init__(self):
-        print("============ Starting tutorial setup")
         moveit_commander.roscpp_initialize(sys.argv)
-        # rospy.init_node('move_group_python_interface',
-        #                 anonymous=True)
-        ## Instantiate a RobotCommander object.  This object is an interface to
-        ## the robot as a whole.
         self._robot = moveit_commander.RobotCommander()
-
-        ## Instantiate a PlanningSceneInterface object.  This object is an interface
-        ## to the world surrounding the robot.
         self._scene = moveit_commander.PlanningSceneInterface()
-
-        ## Instantiate a MoveGroupCommander object.  This object is an interface
-        ## to one group of joints.  In this case the group is the joints in the left
-        ## arm.  This interface can be used to plan and execute motions on the left
-        ## arm.
         self._group = moveit_commander.MoveGroupCommander("manipulator")
 
         # self.pose_target = geometry_msgs.msg.Pose()
