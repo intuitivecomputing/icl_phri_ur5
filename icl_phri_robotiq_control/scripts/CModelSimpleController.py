@@ -134,7 +134,7 @@ def publisher():
     """Main loop which requests new commands and publish them on the CModelRobotOutput topic."""
     rospy.init_node('CModelSimpleController')
     
-    pub = rospy.Publisher('CModelRobotOutput', outputMsg.CModel_robot_output)
+    pub = rospy.Publisher('/gripper_controller/output', outputMsg.CModel_robot_output)
 
     command = outputMsg.CModel_robot_output()
 
