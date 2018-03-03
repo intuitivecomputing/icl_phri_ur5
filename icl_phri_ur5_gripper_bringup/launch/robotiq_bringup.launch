@@ -17,6 +17,7 @@
         <remap from ="out" to="wrench_filtered" />
         <param name="~window_size" value="120" />
     </node>
+    
     <!--moveit bringup-->
     <include file="$(find robotiq_action_server)/launch/robotiq_c_model_action_server.launch">
         <arg name="gripper_name" default="$(arg gripper_name)" />

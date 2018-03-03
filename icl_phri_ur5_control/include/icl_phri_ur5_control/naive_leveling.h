@@ -16,7 +16,7 @@
 
 namespace ur5_control
 {
-typedef boost::shared_ptr<moveit::planning_interface::MoveGroup> MoveGroupPtr;
+//typedef boost::shared_ptr<moveit::planning_interface::MoveGroup> MoveGroupPtr;
 
 class NaiveLeveling
 {
@@ -42,6 +42,9 @@ protected:
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
     moveit::planning_interface::MoveGroup::Plan my_plan_;
     bool success_;
+    robot_state::RobotState start_state_;
+    double tolerence_;
+
 
 }; // class NaiveLeveling
 } // namespace ur5_control

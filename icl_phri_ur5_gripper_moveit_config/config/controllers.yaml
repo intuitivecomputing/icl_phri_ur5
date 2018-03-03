@@ -1,5 +1,6 @@
 controller_list:
-  - name: icl_phri_ur5
+  - name: /vel_based_pos_traj_controller
+  #- name: icl_phri_ur5
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: true
