@@ -12,7 +12,7 @@ from robotiq_c_model_control.msg import _CModel_robot_input as inputMsg
 
 from robotiq_ctrl import ForceTorqueSensor
 
-from robotiq_utils import *
+from icl_phri_robotiq_control.robotiq_utils import *
 
 
 class AverageFilter:

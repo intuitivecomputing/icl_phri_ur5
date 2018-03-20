@@ -18,7 +18,7 @@ from std_msgs.msg import String, Header
 from geometry_msgs.msg import WrenchStamped, Vector3
 import tf
 
-from robotiq_utils import *
+from icl_phri_robotiq_control.robotiq_utils import *
 #from utils import *
 
 norm = lambda a:(a.x+a.y+a.z)/3.
@@ -50,7 +50,7 @@ class MoveGroup:
         self.wpose.orientation.w = 1.0 # first orient gripper and move forward (+x)
 
     def append_waypoint(self, quat):
-	self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
+	    self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
         #self.wpose.position.z = self._group.get_current_pose().pose.position.z + diff
         self.wpose.orientation.x = quat[0]
         self.wpose.orientation.y = quat[1]

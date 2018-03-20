@@ -19,7 +19,7 @@ from geometry_msgs.msg import WrenchStamped, Vector3
 import tf
 from tf.transformations import *
 
-from robotiq_utils import *
+from icl_phri_robotiq_control.robotiq_utils import *
 #from utils import *
 
 normalize = lambda x: x/np.sqrt(x[0]**2.+x[1]**2.+x[2]**2.)
@@ -27,6 +27,17 @@ norm = lambda a:np.sqrt(a.x**2.+a.y**2.+a.z**2.)
 to_quat = lambda o: np.array([o.x, o.y, o.z, o.w])
 rad_to_ang = lambda x: x / np.pi * 180.
 ang_to_rad = lambda x: x / 180. * np.pi
+JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+               'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+Q1 = [1.6492750644683838, -1.8676283995257776, -1.7732299009906214, -1.0136101881610315, 1.5450127124786377, 1.6861138343811035] # above
+
+Q2 = [1.650378704071045, -1.964351002370016, -1.7765887419330042, -0.9513161818133753, 1.5492768287658691, 1.6860419511795044] # down
+
+Q3 = Q1
+
+Q4 = [0.19515973329544067, -2.0777676741229456, -1.3407052198993128, -1.262717072163717, 1.5548584461212158, 0.08926524966955185] # above target
+Q5 = [0.19016268849372864, -2.129251782094137, -1.3405488173114222, -1.2351320425616663, 1.5682377815246582, 0.09852081537246704] # on target
+
 class MoveGroup:
     def __init__(self):
         moveit_commander.roscpp_initialize(sys.argv)
@@ -41,7 +52,7 @@ class MoveGroup:
         self.wpose.orientation.w = 1.0 # first orient gripper and move forward (+x)
 
     def append_waypoint(self, quat):
-	self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
+	    self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
         #self.wpose.position.z = self._group.get_current_pose().pose.position.z + diff
         self.wpose.orientation.x = quat[0]
         self.wpose.orientation.y = quat[1]
@@ -78,12 +89,40 @@ class MoveGroup:
         self.wpose.position = 
         self.wpose.orientation = tf.transformations.quaternion_from_euler(*direction).normalize()
 
+    def move(qs):
+        g = FollowJointTrajectoryGoal()
+        g.trajectory = JointTrajectory()
+        g.trajectory.joint_names = JOINT_NAMES
+        move_time = 5.0
+        try:
+            joint_states = rospy.wait_for_message("joint_states", JointState)
+            joints_pos = joint_states.position
+            g.trajectory.points = []
+            time_from_start = 0.0
+            g.trajectory.points.append(JointTrajectoryPoint(positions=joints_pos, velocities=[0]*6, time_from_start=rospy.Duration(time_from_start)))
+            for q in qs:
+                time_from_start = time_from_start + move_time
+                g.trajectory.points.append(JointTrajectoryPoint(positions=q, velocities=[0]*6, time_from_start=rospy.Duration(5.0)))
+            client.send_goal(g)
+            client.wait_for_result()
+        except KeyboardInterrupt:
+            client.cancel_goal()
+            raise
+        except:
+            raise
 
+    def fetch_and_wait(self):
+        try:
+            self.move([Q1, Q2, Q3])
+        except:
+            raise
+
+    def handover(self):
+        try:
+            self.move([Q4, Q5])
+        except:
+            raise
         
-
-    #def update_pose(self, diff):
-        
-
     def get_pose(self):
         return self._group.get_current_pose().pose
 

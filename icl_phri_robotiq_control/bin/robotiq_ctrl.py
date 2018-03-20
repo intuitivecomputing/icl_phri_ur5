@@ -14,7 +14,7 @@ from geometry_msgs.msg import WrenchStamped, Vector3
 from robotiq_c_model_control.msg import _CModel_robot_output as outputMsg
 from robotiq_c_model_control.msg import _CModel_robot_input as inputMsg
 
-from robotiq_utils import *
+from icl_phri_robotiq_control.robotiq_utils import *
 
 
 

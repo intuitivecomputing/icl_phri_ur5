@@ -39,72 +39,8 @@ def array_to_wrench_stamped(header, array):
     msg.wrench = array_to_wrench(array)
     return msg
 
-class RobotiqActionClient:
-    '''
-        Action client to control robotiq gripper
-    '''
-    def __init__(self, gripper_name):
-        self._gripper_name = gripper_name
-        self._ac = actionlib.SimpleActionClient(self._gripper_name, GripperCommandAction)
-        self._goal = GripperCommandGoal()
-
-        # Wait 10 Seconds for the gripper action server to start or exit
-        if not self._ac.wait_for_server(rospy.Duration(10.0)):
-            rospy.logerr("Exiting - %s Gripper Action Server Not Found" %
-                         (self._gripper_name.capitalize(),))
-            rospy.signal_shutdown("Action Server not found")
-            sys.exit(1)
-        self.clear()
-
-    def send_goal(self, position, effort=100.0, timeout=5.0):
-        self._goal.command.position = position
-        self._goal.command.max_effort = effort
-        self._ac.send_goal(self._goal)
-        self._ac.wait_for_result(timeout=rospy.Duration(timeout))
-        return self._ac.get_result()
-    
-    def cancel(self):
-        self._ac.cancel_goal()
-
-    def clear(self):
-        self._goal = GripperCommandGoal()
-
-
-class QueueSetLength:
-    '''A container with a first-in-first-out (FIFO) queuing policy with a set length.'''
-
-    def __init__(self, length):
-        self._list = np.zeros(6)
-        self._length = length
-
-    def push(self, data):
-        '''Enqueue the 'item' into the queue'''
-        # print(self._list)
-        self._list = np.vstack( ( data, self._list ) )
-        if self._list.shape[0] > self._length:
-            self.pop()
-        
-        return self._list
-
-    def pop(self):
-        '''
-        Dequeue the earliest enqueued item still in the queue. This
-        operation removes the item from the queue.
-        '''
-        
-        self._list = self._list[:-1]
-        return self._list
-
-    def isEmpty(self):
-        '''Returns true if the queue is empty'''
-        return self._list.size == 0
-
-    def average(self):
-        return np.mean(self._list, axis=0)
-
-
 class RobotiqGripperCtrl:
-    def __init__(self):
+    def __init__(self, gripper_name):
         # input gACT gGTO gSTA gOBJ gFLT gPR gPO gCU
         self.query = inputMsg.CModel_robot_input()
         # self.activated = False
@@ -120,15 +56,15 @@ class RobotiqGripperCtrl:
         # output_msg rACT rGTO rATR rPR rSP rFR
         self.command = outputMsg.CModel_robot_output()
         self.command_pub = rospy.Publisher(
-            '/icl_phri_gripper/gripper_controller/output', outputMsg.CModel_robot_output, queue_size=1)
+            gripper_name + '/output', outputMsg.CModel_robot_output, queue_size=1)
         print("init gripper")
         self.reset()
         sleep(3)
         self.activate()
         sleep(3)
         print("finished")
-	self.query_sub = rospy.Subscriber(
-            '/icl_phri_gripper/gripper_controller/input', inputMsg.CModel_robot_input, self.query_callback)
+        self.query_sub = rospy.Subscriber(
+            gripper_name + '/input', inputMsg.CModel_robot_input, self.query_callback)
 
     def query_callback(self, input):
         print("callback")
@@ -192,3 +128,70 @@ class RobotiqGripperCtrl:
             return True
         else:
             return False
+
+
+class RobotiqActionClient:
+    '''
+        Action client to control robotiq gripper
+    '''
+    def __init__(self, gripper_name):
+        self._gripper_ctrl = RobotiqGripperCtrl(gripper_name)
+        self._gripper_name = gripper_name
+        self._ac = actionlib.SimpleActionClient(self._gripper_name, GripperCommandAction)
+        self._goal = GripperCommandGoal()
+
+        # Wait 10 Seconds for the gripper action server to start or exit
+        if not self._ac.wait_for_server(rospy.Duration(10.0)):
+            rospy.logerr("Exiting - %s Gripper Action Server Not Found" %
+                         (self._gripper_name.capitalize(),))
+            rospy.signal_shutdown("Action Server not found")
+            sys.exit(1)
+        self.clear()
+
+    def send_goal(self, position, effort=100.0, timeout=5.0):
+        self._goal.command.position = position
+        self._goal.command.max_effort = effort
+        self._ac.send_goal(self._goal)
+        self._ac.wait_for_result(timeout=rospy.Duration(timeout))
+        return self._ac.get_result()
+    
+    def cancel(self):
+        self._ac.cancel_goal()
+
+    def clear(self):
+        self._goal = GripperCommandGoal()
+
+
+class QueueSetLength:
+    '''A container with a first-in-first-out (FIFO) queuing policy with a set length.'''
+
+    def __init__(self, length):
+        self._list = np.zeros(6)
+        self._length = length
+
+    def push(self, data):
+        '''Enqueue the 'item' into the queue'''
+        # print(self._list)
+        self._list = np.vstack( ( data, self._list ) )
+        if self._list.shape[0] > self._length:
+            self.pop()
+        
+        return self._list
+
+    def pop(self):
+        '''
+        Dequeue the earliest enqueued item still in the queue. This
+        operation removes the item from the queue.
+        '''
+        
+        self._list = self._list[:-1]
+        return self._list
+
+    def isEmpty(self):
+        '''Returns true if the queue is empty'''
+        return self._list.size == 0
+
+    def average(self):
+        return np.mean(self._list, axis=0)
+
+
