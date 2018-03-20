@@ -14,6 +14,7 @@ from geometry_msgs.msg import PoseStamped
 from moveit_msgs.msg import Grasp, GripperTranslation, PlaceLocation
 
 import rospy
+from ros_myo.msg import EmgArray
 from std_msgs.msg import String, Header
 from geometry_msgs.msg import WrenchStamped, Vector3
 import tf
@@ -145,6 +146,30 @@ class MoveGroup:
     def __del__(self):
         moveit_commander.roscpp_shutdown()
 
+class HandOver:
+    def __init__(self):
+        self._mg = MoveGroup()
+        self._gripper_ac = RobotiqActionClient('icl_phri_gripper/gripper_controller')
+        self._myo_gest_sub = rospy.Subscriber('/myo_raw/myo_gest_str', 
+                                              String, 
+                                              self.myo_gest_callback, queue_size=1)
+        self._myo_emg_sub = rospy.Subscriber('/myo_raw/myo_emg', 
+                                              EmgArray, 
+                                              self.myo_emg_callback, queue_size=1)
+
+        self.emg_array = np.array([])
+        self.cmd_flag = False
+        self.euler = np.zeros(3)
+        self.axes = 2
+	    self.effort = 0
+        rospy.Timer(rospy.Duration(0.01), self.timer_cb)
+
+    def myo_gest_callback(self, msg):
+        pass
+    
+    def myo_emg_callback(self, msg):
+        self.emg_array = np.array(msg.data)
+
 
 class NaiveLeveling:
     def __init__(self):
@@ -161,7 +186,7 @@ class NaiveLeveling:
         self.cmd_flag = False
         self.euler = np.zeros(3)
         self.axes = 2
-	self.effort = 0
+	    self.effort = 0
         #print(self._mg.get_pose())
         #self.last_torque = None
         #self.diff = 0

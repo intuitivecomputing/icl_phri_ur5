@@ -135,7 +135,6 @@ class RobotiqActionClient:
         Action client to control robotiq gripper
     '''
     def __init__(self, gripper_name):
-        self._gripper_ctrl = RobotiqGripperCtrl(gripper_name)
         self._gripper_name = gripper_name
         self._ac = actionlib.SimpleActionClient(self._gripper_name, GripperCommandAction)
         self._goal = GripperCommandGoal()
@@ -147,6 +146,9 @@ class RobotiqActionClient:
             rospy.signal_shutdown("Action Server not found")
             sys.exit(1)
         self.clear()
+
+    def initiate(self):
+        self._gripper_ctrl = RobotiqGripperCtrl(self._gripper_name)
 
     def send_goal(self, position, effort=100.0, timeout=5.0):
         self._goal.command.position = position

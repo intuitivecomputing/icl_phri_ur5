@@ -23,13 +23,13 @@ def main():
     print ("ns" + str(args.ns))
     gripper_name = rospy.get_param('~gripper_name', args.ns + '/gripper_controller')
     #gripper_name = rospy.get_param('~gripper_name', 'gripper_controller')
+    gripper_client = RobotiqActionClient(gripper_name)
     if args.init: 
         #RobotiqGripperCtrl(gripper_name)
-        gripper_client = RobotiqActionClient(gripper_name)
+        gripper_client.initiate()
         print(gripper_client.send_goal(0.14))
         
     if args.position is not None:
-        gripper_client = RobotiqActionClient(gripper_name)
         if args.effort is not None:
             print(gripper_client.send_goal(args.position, effort=args.effort))
         else:
