@@ -119,16 +119,16 @@ class RobotiqGripperCtrl:
         self.grasp_status = 0
         # output_msg rACT rGTO rATR rPR rSP rFR
         self.command = outputMsg.CModel_robot_output()
-        self.query_sub = rospy.Subscriber(
-            'CModelRobotInput', inputMsg.CModel_robot_input, self.query_callback)
         self.command_pub = rospy.Publisher(
-            'CModelRobotOutput', outputMsg.CModel_robot_output, queue_size=1)
+            '/icl_phri_gripper/gripper_controller/output', outputMsg.CModel_robot_output, queue_size=1)
         print("init gripper")
         self.reset()
-        sleep(1)
+        sleep(3)
         self.activate()
         sleep(3)
         print("finished")
+	self.query_sub = rospy.Subscriber(
+            '/icl_phri_gripper/gripper_controller/input', inputMsg.CModel_robot_input, self.query_callback)
 
     def query_callback(self, input):
         print("callback")

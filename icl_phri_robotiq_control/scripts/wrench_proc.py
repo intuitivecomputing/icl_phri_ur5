@@ -123,7 +123,7 @@ class GravityCompensation(MsgProc):
         MsgProc.trans_rot = input_data
 
 
-class MsgProcPipeline:
+class FTSProcPipeline:
     def __init__(self, topic_name='robotiq_force_torque_wrench', filter_list=[], args_list=[]):
         rospy.init_node('message_processing', anonymous=True)
         MsgProc.args_list = args_list

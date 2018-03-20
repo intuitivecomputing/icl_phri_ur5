@@ -1,6 +1,6 @@
 controller_list:
-  - name: /vel_based_pos_traj_controller
-  #- name: icl_phri_ur5
+#  - name: vel_based_pos_traj_controller
+  - name: icl_phri_ur5
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     default: true
@@ -11,12 +11,12 @@ controller_list:
       - wrist_1_joint
       - wrist_2_joint
       - wrist_3_joint
-  - name: icl_phri_gripper
-    action_ns: gripper_controller
-    type: GripperCommand
-    default: false
-    joints:
-      - finger_joint
+#- name: icl_phri_gripper
+#  action_ns: gripper_controller
+#    type: GripperCommand
+#    default: false
+#    joints:
+#      - finger_joint
 
 
 #initial:

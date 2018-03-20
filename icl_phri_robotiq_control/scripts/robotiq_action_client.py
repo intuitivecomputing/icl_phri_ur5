@@ -15,11 +15,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--position', '-p', metavar='N', type=float, help='Position in meter.0.0-0.14')
     parser.add_argument('--init', '-i', metavar='0/1', type=int, nargs='?', help='initialization', const=1, default=0)
+    parser.add_argument('--ns', '-n', type=str, nargs='?', help='namespace', const="", default="icl_phri_gripper")
     args = parser.parse_args()
     
     rospy.init_node('gripper_action_client')
-    #gripper_name = rospy.get_param('~gripper_name', 'icl_phri_gripper/gripper_controller')
-    gripper_name = rospy.get_param('~gripper_name', 'gripper_controller')
+    print ("ns" + str(args.ns))
+    gripper_name = rospy.get_param('~gripper_name', args.ns + '/gripper_controller')
+    #gripper_name = rospy.get_param('~gripper_name', 'gripper_controller')
     if args.init: 
         RobotiqGripperCtrl()
         gripper_client = RobotiqActionClient(gripper_name)

@@ -5,12 +5,20 @@ import numpy as np
 from time import sleep
 import sys
 import copy
+import moveit_commander
+import moveit_msgs.msg
+import geometry_msgs.msg
+
+from geometry_msgs.msg import PoseStamped
+from moveit_msgs.msg import Grasp, GripperTranslation, PlaceLocation
 
 import rospy
 from std_msgs.msg import String, Header
 from geometry_msgs.msg import WrenchStamped, Vector3
 
-from utils import *
+#from utils import *
+
+norm = lambda a:(a.x+a.y+a.z)/3.
 
 class MoveGroup:
     def __init__(self):
@@ -19,49 +27,44 @@ class MoveGroup:
         self._scene = moveit_commander.PlanningSceneInterface()
         self._group = moveit_commander.MoveGroupCommander("manipulator")
 
-        # self.pose_target = geometry_msgs.msg.Pose()
-        ## We create this DisplayTrajectory publisher which is used below to publish
-        ## trajectories for RVIZ to visualize.
-        # self._display_trajectory_publisher = rospy.Publisher(
-        #                                     '/move_group/display_planned_path',
-        #                                     moveit_msgs.msg.DisplayTrajectory, 
-        #                                     queue_size=1)
-
         ## Wait for RVIZ to initialize. This sleep is ONLY to allow Rviz to come up.
         print("============ Waiting for RVIZ...")
-        rospy.sleep(1)
+        #group_variable_values = self._group.get_current_joint_values()
+        #initial_position = [0.0, -1.2, 1.8, -0.6, 1.6, 0.0]
+        #group_variable_values = list(initial_position)
+        #self._group.set_joint_value_target(group_variable_values) #Set a joint target
+        #initial_plan=self._group.plan()
+        #self._group.execute(initial_plan)
+        rospy.sleep(2)  #Wait for RViz to visualize
         print("============ Starting ")
+        self.waypoints = []
+        self.waypoints.append(self._group.get_current_pose().pose) # start with the current pose
+        #self.base_xyz = [self.waypoints[0].position.x, self.waypoints[0].position.y, self.waypoints[0].position.z ] #Initial position is the basement
+        self.wpose = geometry_msgs.msg.Pose()
+        self.wpose.orientation.w = 1.0 # first orient gripper and move forward (+x)
 
+    def append_waypoint(self, diff):
+	self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
+        self.wpose.position.z = self._group.get_current_pose().pose.position.z + diff
+        self.waypoints.append(copy.deepcopy(self.wpose))
+        (cartesian_plan, fraction) = self._group.compute_cartesian_path(
+                                     self.waypoints,   # waypoints to follow
+                                     0.005,        # eef_step, 1cm
+                                     0.0)         # jump_threshold, disabling
+        self._group.execute(cartesian_plan)
+        self.waypoints.pop(0)
+
+    #def update_pose(self, diff):
+        
 
     def get_pose(self):
         return self._group.get_current_pose().pose
-
-    # def set_pose_target(self, pose):
-    #     # pose_target.orientation = geometry_msgs.msg.Quaternion(*quaternion_from_euler(-1.160, 0, 3.009))
-    #     self.pose_target.orientation = pose.orientation
-    #     self.pose_target.position.x = pose.position.x
-    #     self.pose_target.position.y = pose.position.y
-    #     self.pose_target.position.z = pose.position.z
 
     def shift_pose_target(self, axis, value):
         axis_dict = {'x': 0, 'y': 1, 'z': 2, 'r': 3, 'p': 4, 'y': 5}
         print('ee: %s' % self._group.get_end_effector_link())
         self._group.shift_pose_target(axis_dict[axis], value, self._group.get_end_effector_link())
         #self.pose_target = self.get_pose()
-
-    # def set_pose_target_from_array(self, pose_array):
-    #     # x,y,z,qx,qy,qz,w or xyzrpy
-    #     # pose_target.orientation = geometry_msgs.msg.Quaternion(*quaternion_from_euler(-1.160, 0, 3.009))
-    #     if pose_array.shape[0]==6:
-    #         self.pose_target.orientation = geometry_msgs.msg.Quaternion(*quaternion_from_euler(*pose_array[3:]))
-    #     else:
-    #         self.pose_target.orientation = geometry_msgs.msg.Quaternion(*pose_array[3:])
-    #     self.pose_target.position.x = pose_array[0]
-    #     self.pose_target.position.y = pose_array[1]
-    #     self.pose_target.position.z = pose_array[2]
-
-    # def update_pose_target(self):
-    #     self.pose_target = self.get_pose()
 
     def plan_move(self):
         print("============ Generating plan")
@@ -83,14 +86,21 @@ class NaiveLeveling:
                                             WrenchStamped, 
                                             self._wrench_callback, 
                                             queue_size=1)
-        print(self._mg.get_pose())
-        self.last_torque = None
-        self.diff = 0
+	self.effort = 0
+        #print(self._mg.get_pose())
+        #self.last_torque = None
+        #self.diff = 0
         # self._mg.update_pose_target()
         #r.sleep()
         rospy.spin()
 
     def _wrench_callback(self, msg):
+	
+	#self.effort = 0.2 * self.effort + 0.8 * msg.wrench.torque.y
+	print((msg.wrench.torque.y-0.3))
+        if msg.wrench.torque.y > 0.6 or msg.wrench.torque.y < 0:
+            self._mg.append_waypoint(-(msg.wrench.torque.y-0.3)*0.01)
+        '''
         if self.last_torque:
             self.diff = msg.wrench.torque.y - self.last_torque
             self.last_torque = msg.wrench.torque.y
@@ -107,7 +117,7 @@ class NaiveLeveling:
             self._mg.go()
         print(self.diff)  
         print(self._mg.pose_target.position) 
-
+        '''
 
         
 if __name__ == '__main__':
