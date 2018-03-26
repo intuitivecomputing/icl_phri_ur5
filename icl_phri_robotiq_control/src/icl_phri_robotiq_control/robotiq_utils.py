@@ -59,16 +59,16 @@ class RobotiqGripperCtrl:
             gripper_name + '/output', outputMsg.CModel_robot_output, queue_size=1)
         print("init gripper")
         self.reset()
-        sleep(3)
+        sleep(1)
         self.activate()
-        sleep(3)
+        sleep(1)
         print("finished")
         self.query_sub = rospy.Subscriber(
             gripper_name + '/input', inputMsg.CModel_robot_input, self.query_callback)
 
     def query_callback(self, input):
-        print("callback")
-        print(self.query.gSTA)
+        #print("callback")
+        #print(self.query.gSTA)
         self.query = input
         self.activated = True if self.query.gSTA == 1 else False
 
@@ -157,6 +157,12 @@ class RobotiqActionClient:
         self._ac.wait_for_result(timeout=rospy.Duration(timeout))
         return self._ac.get_result()
     
+    def wait_for_result(self):
+        return self._ac.wait_for_result()
+
+    def wait_for_server(self):
+        return self._ac.wait_for_server()
+
     def cancel(self):
         self._ac.cancel_goal()
 

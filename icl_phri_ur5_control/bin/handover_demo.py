@@ -12,6 +12,9 @@ import geometry_msgs.msg
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseStamped
 from moveit_msgs.msg import Grasp, GripperTranslation, PlaceLocation
+from control_msgs.msg import *
+from trajectory_msgs.msg import *
+from sensor_msgs.msg import JointState
 
 import rospy
 from ros_myo.msg import EmgArray
@@ -21,7 +24,6 @@ import tf
 from tf.transformations import *
 
 from icl_phri_robotiq_control.robotiq_utils import *
-#from utils import *
 
 normalize = lambda x: x/np.sqrt(x[0]**2.+x[1]**2.+x[2]**2.)
 norm = lambda a:np.sqrt(a.x**2.+a.y**2.+a.z**2.)
@@ -38,7 +40,7 @@ Q3 = Q1
 
 Q4 = [0.19515973329544067, -2.0777676741229456, -1.3407052198993128, -1.262717072163717, 1.5548584461212158, 0.08926524966955185] # above target
 Q5 = [0.19016268849372864, -2.129251782094137, -1.3405488173114222, -1.2351320425616663, 1.5682377815246582, 0.09852081537246704] # on target
-
+ 
 class MoveGroup:
     def __init__(self):
         moveit_commander.roscpp_initialize(sys.argv)
@@ -51,9 +53,12 @@ class MoveGroup:
         
         self.wpose = geometry_msgs.msg.Pose()
         self.wpose.orientation.w = 1.0 # first orient gripper and move forward (+x)
-
+        self.client = actionlib.SimpleActionClient('icl_phri_ur5/follow_joint_trajectory', FollowJointTrajectoryAction)
+        print ("Waiting for server...")
+        self.client.wait_for_server()
+        
     def append_waypoint(self, quat):
-	    self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
+        self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
         #self.wpose.position.z = self._group.get_current_pose().pose.position.z + diff
         self.wpose.orientation.x = quat[0]
         self.wpose.orientation.y = quat[1]
@@ -87,40 +92,32 @@ class MoveGroup:
 
     def sphere_waypoint(self, direction, dist=0.5):
         #self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
-        self.wpose.position = 
+        n_dir = normalize(direction)
+        self.wpose.position.x = n_dir[0] * np.sqrt(dist)
+        self.wpose.position.y = n_dir[1] * np.sqrt(dist)
+        self.wpose.position.z = n_dir[2] * np.sqrt(dist)
         self.wpose.orientation = tf.transformations.quaternion_from_euler(*direction).normalize()
 
-    def move(qs):
+    def move(self, qs):
         g = FollowJointTrajectoryGoal()
         g.trajectory = JointTrajectory()
         g.trajectory.joint_names = JOINT_NAMES
         move_time = 5.0
         try:
-            joint_states = rospy.wait_for_message("joint_states", JointState)
+            joint_states = rospy.wait_for_message("icl_phri_ur5/joint_states", JointState)
             joints_pos = joint_states.position
+            #joints_pos = self._group.get_current_joint_values()
             g.trajectory.points = []
             time_from_start = 0.0
             g.trajectory.points.append(JointTrajectoryPoint(positions=joints_pos, velocities=[0]*6, time_from_start=rospy.Duration(time_from_start)))
             for q in qs:
                 time_from_start = time_from_start + move_time
-                g.trajectory.points.append(JointTrajectoryPoint(positions=q, velocities=[0]*6, time_from_start=rospy.Duration(5.0)))
-            client.send_goal(g)
-            client.wait_for_result()
+                g.trajectory.points.append(JointTrajectoryPoint(positions=q, velocities=[0]*6, time_from_start=rospy.Duration(time_from_start)))
+            self.client.send_goal(g)
+            return self.client.wait_for_result()
         except KeyboardInterrupt:
-            client.cancel_goal()
+            self.client.cancel_goal()
             raise
-        except:
-            raise
-
-    def fetch_and_wait(self):
-        try:
-            self.move([Q1, Q2, Q3])
-        except:
-            raise
-
-    def handover(self):
-        try:
-            self.move([Q4, Q5])
         except:
             raise
         
@@ -150,95 +147,83 @@ class HandOver:
     def __init__(self):
         self._mg = MoveGroup()
         self._gripper_ac = RobotiqActionClient('icl_phri_gripper/gripper_controller')
+        self._gripper_ac.wait_for_server()
+        print('Init gripper')
+        self._gripper_ac.initiate()
+
         self._myo_gest_sub = rospy.Subscriber('/myo_raw/myo_gest_str', 
                                               String, 
-                                              self.myo_gest_callback, queue_size=1)
+                                              self.myo_gest_callback, queue_size=10)
         self._myo_emg_sub = rospy.Subscriber('/myo_raw/myo_emg', 
                                               EmgArray, 
                                               self.myo_emg_callback, queue_size=1)
-
+        self._wrench_sub = rospy.Subscriber('icl_phri_gripper/wrench_filtered', 
+                                            WrenchStamped, 
+                                            self._wrench_callback, 
+                                            queue_size=11)
         self.emg_array = np.array([])
         self.cmd_flag = False
         self.euler = np.zeros(3)
         self.axes = 2
-	    self.effort = 0
-        rospy.Timer(rospy.Duration(0.01), self.timer_cb)
+        self.effort = 0
+        
+        self.rest_counter = 0
+        self.at_rest = False
+        self.is_handing = False
+
+    def _wrench_callback(self, msg):
+        if msg.wrench.force.z > 3:
+            self._gripper_ac.send_goal(0.14)
+            self.is_handing = False
+            print('move away')
+            print(self._mg.move([Q1, Q2]))
+            self._gripper_ac.send_goal(0.0)
+            print(self._mg.move([Q3]))
+
 
     def myo_gest_callback(self, msg):
-        pass
+        if msg.data=='FIST' and not self.is_handing:
+            print('prepare')
+            self._mg.move([Q1, Q2])     
+            self._gripper_ac.send_goal(0.0)
+            print(self._mg.move([Q3]))
+            self.is_handing = True
+        elif msg.data=='FINGERS_SPREAD':
+            print('handover')
+            print(self._mg.move([Q4, Q5]))
+            #self._gripper_ac.send_goal(0.14)
+            #self.is_handing = False
+            # print('move away')
+            # print(self._mg.move([Q1,Q2]))
     
     def myo_emg_callback(self, msg):
+        return
         self.emg_array = np.array(msg.data)
-
-
-class NaiveLeveling:
-    def __init__(self):
-        # r = rospy.Rate(15)
-        self._mg = MoveGroup()
-        self._gripper_ac = RobotiqActionClient('icl_phri_gripper/gripper_controller')
-        #self._myo_sub = rospy.Subscriber('/myo_raw/pose', 
-        #                                    geometry_msgs.msg.PoseStamped, 
-        #                                    self._myo_callback, 
-        #                                    queue_size=1)
-        self._myo_gest_sub = rospy.Subscriber('/myo_raw/myo_gest_str', 
-                                            String, 
-                                            self._myo_gest_callback, queue_size=1)
-        self.cmd_flag = False
-        self.euler = np.zeros(3)
-        self.axes = 2
-	    self.effort = 0
-        #print(self._mg.get_pose())
-        #self.last_torque = None
-        #self.diff = 0
-        # self._mg.update_pose_target()
-        #r.sleep()
-        rospy.Timer(rospy.Duration(0.01), self.timer_cb)
+        if sum(filter(lambda x: x > 40, self.emg_array)) == 0:
+            self.rest_counter += 1
+            if self.rest_counter == 50:
+                print('handover')
+                self.is_handing = True
+                self.at_rest = True
+                print(self._mg.move([Q4, Q5]))
+                self._gripper_ac.send_goal(0.0)
+                self._gripper_ac.wait_for_result()
+                self._gripper_ac.send_goal(0.14)
+                if (self._gripper_ac.wait_for_result()):
+                    self.is_handing = False
+        else: 
+            if self.at_rest and not self.is_handing:
+                print('move away')
+                print(self._mg.move([Q4, Q1, Q2]))
+                self._gripper_ac.send_goal(0.14)
+                self._gripper_ac.wait_for_result()
+            self.rest_counter = 0
+            self.at_rest = False
         
-
-    def _myo_gest_callback(self, msg):
-        if msg.data=='FIST':
-             print(self._gripper_ac.send_goal(0.0))
-        if msg.data=='FINGERS_SPREAD':
-             print(self._gripper_ac.send_goal(0.14))
-        if msg.data=='WAVE_IN':
-             self.cmd_flag = True
-             self.euler = np.zeros(3)
-             self.euler[self.axes] = ang_to_rad(5.0)
-             #print(output)
-             #self._mg.append_angle_waypoint(output)
-        if msg.data=='WAVE_OUT':
-             self.cmd_flag = True
-             self.euler = np.zeros(3)
-             self.euler[self.axes] = ang_to_rad(-5.0)
-             #self._mg.append_angle_waypoint(output)
-        if msg.data=='REST':
-             #self._mg.stop()
-             self.euler = np.zeros(3)
-             self.cmd_flag = False
-        
-        if msg.data=='THUMB_TO_PINKY': 
-             #self.axes = (self.axes + 1) % 3
-             print(self.axes)
-
-    def _myo_callback(self, msg):
-	
-	#self.effort = 0.2 * self.effort + 0.8 * msg.wrench.torque.y
-	#print(msg.pose.orientation)
-        quat_orig = to_quat(self._mg.get_pose().orientation)
-        quat_incre = to_quat(msg.pose.orientation)
-        quat_incre = np.around(quat_incre, decimals=1)
-        print(quat_incre)
-        if np.max(np.abs(quat_incre[0:3])) <= 0.5:
-            quat_goal = tf.transformations.quaternion_multiply(quat_orig, quat_incre)
-            self._mg.append_waypoint(quat_goal)
-
-    def timer_cb(self, _event):
-       if self.cmd_flag:
-           self._mg.append_angle_waypoint(self.euler)
         
 
         
 if __name__ == '__main__':
     rospy.init_node('naive_leveling', anonymous=True)
-    NaiveLeveling()
+    h = HandOver()
     rospy.spin()
