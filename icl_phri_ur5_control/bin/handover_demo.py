@@ -106,7 +106,7 @@ class MoveGroup:
         g = FollowJointTrajectoryGoal()
         g.trajectory = JointTrajectory()
         g.trajectory.joint_names = JOINT_NAMES
-        move_time = 5.0
+        move_time = 2.0
         try:
             joint_states = rospy.wait_for_message("icl_phri_ur5/joint_states", JointState)
             joints_pos = joint_states.position
@@ -160,7 +160,7 @@ class HandOver:
                                               self.myo_gest_callback, queue_size=10)
         self._myo_emg_sub = rospy.Subscriber('/myo_raw/myo_emg', 
                                               EmgArray, 
-                                              self.myo_emg_callback, queue_size=1)
+                                              self.myo_emg_callback, queue_size=10)
         self._wrench_sub = rospy.Subscriber('icl_phri_gripper/wrench_filtered', 
                                             WrenchStamped, 
                                             self._wrench_callback, 
@@ -178,12 +178,12 @@ class HandOver:
         self.wait_for_action = True
 
     def _wrench_callback(self, msg):
-        if msg.wrench.force.z > 5 and self.wait_for_action:
+        if msg.wrench.force.z > 4 and self.wait_for_action:
             self._gripper_ac.send_goal(0.14)
             self.is_handing = False
             self.wait_for_action = False
             print('handed')
-            print(self._mg.move([Q_wait, Q_fetch]))
+            print(self._mg.move([ Q_fetch]))
             self.wait_for_action = True
 
         elif msg.wrench.force.z < -5 and not self.is_handing and self.wait_for_action:
@@ -201,9 +201,10 @@ class HandOver:
         #     self._gripper_ac.send_goal(0.0)
         #     print(self._mg.move([Q3]))
         #     self.is_handing = True
+        return
         if msg.data=='FINGERS_SPREAD' and self.is_handing:
             print('handover')
-            print(self._mg.move([Q_wait, Q_give]))
+            print(self._mg.move([Q_give]))
             self.wait_for_action = True
             #self._gripper_ac.send_goal(0.14)
             #self.is_handing = False
@@ -211,26 +212,14 @@ class HandOver:
             # print(self._mg.move([Q1,Q2]))
     
     def myo_emg_callback(self, msg):
-        return
         self.emg_array = np.array(msg.data)
-        if sum(filter(lambda x: x > 40, self.emg_array)) == 0:
+        if sum(filter(lambda x: x > 40, self.emg_array)) == 0 and self.is_handing and not self.wait_for_action:
             self.rest_counter += 1
-            if self.rest_counter == 50:
+            if self.rest_counter == 20:
                 print('handover')
-                self.is_handing = True
-                self.at_rest = True
-                print(self._mg.move([Q4, Q5]))
-                self._gripper_ac.send_goal(0.0)
-                self._gripper_ac.wait_for_result()
-                self._gripper_ac.send_goal(0.14)
-                if (self._gripper_ac.wait_for_result()):
-                    self.is_handing = False
+                print(self._mg.move([Q_give]))
+                self.wait_for_action = True
         else: 
-            if self.at_rest and not self.is_handing:
-                print('move away')
-                print(self._mg.move([Q4, Q1, Q2]))
-                self._gripper_ac.send_goal(0.14)
-                self._gripper_ac.wait_for_result()
             self.rest_counter = 0
             self.at_rest = False
         
