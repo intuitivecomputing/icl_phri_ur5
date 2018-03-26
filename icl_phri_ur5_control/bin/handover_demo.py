@@ -2,6 +2,7 @@
 
 from __future__ import division, print_function
 import numpy as np
+from math import *
 from time import sleep
 import sys
 import copy
@@ -32,15 +33,18 @@ rad_to_ang = lambda x: x / np.pi * 180.
 ang_to_rad = lambda x: x / 180. * np.pi
 JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
                'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-Q1 = [1.6492750644683838, -1.8676283995257776, -1.7732299009906214, -1.0136101881610315, 1.5450127124786377, 1.6861138343811035] # above
+Q_fetch = [1.5279078483581543, -2.149566952382223, -1.1292513052569788, 0.14056265354156494, 1.786577582359314, 1.541101336479187]
+Q_wait = [0.6767016649246216, -1.2560237089740198, -1.9550021330462855, -0.019442383443013966, 1.5472047328948975, 1.5413050651550293]
+Q_give = [-0.20308286348451787, -2.2909210363971155, -1.2152870337115687, 0.34171295166015625, 1.4318565130233765, 1.5419158935546875]
+# Q1 = [1.6492750644683838, -1.8676283995257776, -1.7732299009906214, -1.0136101881610315, 1.5450127124786377, 1.6861138343811035] # above
 
-Q2 = [1.650378704071045, -1.964351002370016, -1.7765887419330042, -0.9513161818133753, 1.5492768287658691, 1.6860419511795044] # down
+# Q2 = [1.650378704071045, -1.964351002370016, -1.7765887419330042, -0.9513161818133753, 1.5492768287658691, 1.6860419511795044] # down
 
-Q3 = Q1
+# Q3 = Q1
 
-Q4 = [0.19515973329544067, -2.0777676741229456, -1.3407052198993128, -1.262717072163717, 1.5548584461212158, 0.08926524966955185] # above target
-Q5 = [0.19016268849372864, -2.129251782094137, -1.3405488173114222, -1.2351320425616663, 1.5682377815246582, 0.09852081537246704] # on target
- 
+# # Q4 = [0.19515973329544067, -2.0777676741229456, -1.3407052198993128, -1.262717072163717, 1.5548584461212158, 0.08926524966955185] # above target
+# # Q5 = [0.19016268849372864, -2.129251782094137, -1.3405488173114222, -1.2351320425616663, 1.5682377815246582, 0.09852081537246704] # on target
+
 class MoveGroup:
     def __init__(self):
         moveit_commander.roscpp_initialize(sys.argv)
@@ -172,25 +176,29 @@ class HandOver:
         self.is_handing = False
 
     def _wrench_callback(self, msg):
-        if msg.wrench.force.z > 3:
+        if msg.wrench.force.z > 5:
             self._gripper_ac.send_goal(0.14)
             self.is_handing = False
-            print('move away')
-            print(self._mg.move([Q1, Q2]))
+            print('handed')
+            print(self._mg.move([Q_wait, Q_fetch]))
+
+        elif msg.wrench.force.z < -5:
             self._gripper_ac.send_goal(0.0)
-            print(self._mg.move([Q3]))
+            self.is_handing = True
+            print('fetched')
+            print(self._mg.move([Q_wait]))
 
 
     def myo_gest_callback(self, msg):
-        if msg.data=='FIST' and not self.is_handing:
-            print('prepare')
-            self._mg.move([Q1, Q2])     
-            self._gripper_ac.send_goal(0.0)
-            print(self._mg.move([Q3]))
-            self.is_handing = True
-        elif msg.data=='FINGERS_SPREAD':
+        # if msg.data=='FIST' and not self.is_handing:
+        #     print('prepare')
+        #     self._mg.move([Q1, Q2])     
+        #     self._gripper_ac.send_goal(0.0)
+        #     print(self._mg.move([Q3]))
+        #     self.is_handing = True
+        if msg.data=='FINGERS_SPREAD' and self.is_handing:
             print('handover')
-            print(self._mg.move([Q4, Q5]))
+            print(self._mg.move([Q_wait, Q_give]))
             #self._gripper_ac.send_goal(0.14)
             #self.is_handing = False
             # print('move away')
