@@ -174,19 +174,24 @@ class HandOver:
         self.rest_counter = 0
         self.at_rest = False
         self.is_handing = False
+        print(self._mg.move([Q_wait, Q_fetch]))
+        self.wait_for_action = True
 
     def _wrench_callback(self, msg):
-        if msg.wrench.force.z > 5:
+        if msg.wrench.force.z > 5 and self.wait_for_action:
             self._gripper_ac.send_goal(0.14)
             self.is_handing = False
+            self.wait_for_action = False
             print('handed')
             print(self._mg.move([Q_wait, Q_fetch]))
+            self.wait_for_action = True
 
-        elif msg.wrench.force.z < -5:
+        elif msg.wrench.force.z < -5 and not self.is_handing and self.wait_for_action:
             self._gripper_ac.send_goal(0.0)
             self.is_handing = True
             print('fetched')
             print(self._mg.move([Q_wait]))
+            self.wait_for_action = False
 
 
     def myo_gest_callback(self, msg):
@@ -199,6 +204,7 @@ class HandOver:
         if msg.data=='FINGERS_SPREAD' and self.is_handing:
             print('handover')
             print(self._mg.move([Q_wait, Q_give]))
+            self.wait_for_action = True
             #self._gripper_ac.send_goal(0.14)
             #self.is_handing = False
             # print('move away')
