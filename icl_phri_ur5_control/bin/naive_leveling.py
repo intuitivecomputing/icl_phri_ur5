@@ -44,7 +44,7 @@ class MoveGroup:
         self.wpose.orientation.w = 1.0 # first orient gripper and move forward (+x)
 
     def append_waypoint(self, diff):
-	self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
+	    self.wpose = copy.deepcopy(self._group.get_current_pose().pose)
         self.wpose.position.z = self._group.get_current_pose().pose.position.z + diff
         self.waypoints.append(copy.deepcopy(self.wpose))
         (cartesian_plan, fraction) = self._group.compute_cartesian_path(
@@ -86,7 +86,7 @@ class NaiveLeveling:
                                             WrenchStamped, 
                                             self._wrench_callback, 
                                             queue_size=1)
-	self.effort = 0
+	    self.effort = 0
         #print(self._mg.get_pose())
         #self.last_torque = None
         #self.diff = 0
