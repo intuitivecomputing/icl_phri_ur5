@@ -1,0 +1,26 @@
+sudo: required 
+dist: trusty 
+language: generic 
+compiler:
+  - gcc
+notifications:
+  email:
+    recipients:
+      - gm130s@gmail.com
+env:
+  matrix:
+    - ROS_DISTRO="kinetic"
+    - ROS_DISTRO="jade"   ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu  USE_DEB=true
+    - ROS_DISTRO="jade"   ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu  USE_DEB=true
+    - ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu  USE_DEB=true
+    - ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu  USE_DEB=true
+matrix:
+  allow_failures:
+    - env: ROS_DISTRO="kinetic"
+    - env: ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu  USE_DEB=true
+    - env: ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu  USE_DEB=true
+install:
+  - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+script:
+  - source .ci_config/travis.sh  # mongo hack (https://github.com/ros-planning/warehouse_ros/blob/849d5979e0186db124d3a1eda0278ebaa15e4ff0/.travis.yml#L27-L29) is already taken care of in here.
+#  - source ./travis.sh  # Enable this when you have a package-local script 
