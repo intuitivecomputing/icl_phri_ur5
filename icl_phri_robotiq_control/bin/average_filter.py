@@ -46,7 +46,7 @@ class AverageFilter:
 if __name__ == '__main__':
     rospy.init_node('average_filter', anonymous=True)
     try:
-        AverageFilter()
+        AverageFilter(100)
     except rospy.ROSInterruptException:
         pass
     rospy.spin()

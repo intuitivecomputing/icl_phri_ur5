@@ -93,9 +93,9 @@ class HandOver:
         self.torque_z = msg.wrench.torque.z + 0.142
         print (self.torque_z)
         if self.torque_z > 0.3: # ccw
-            self._mg.move(5, 1)
+            self._mg.move(30, 1)
         elif self.torque_z < -0.3: # cw 
-            self._mg.move(-5, 1)
+            self._mg.move(-30, 1)
 
 if __name__ == '__main__':
     rospy.init_node('naive_leveling', anonymous=True)
