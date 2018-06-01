@@ -3,7 +3,7 @@ project(icl_phri_ur5_control)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
-
+catkin_python_setup()
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -17,9 +17,11 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf2_ros
+  ur_kinematics
 )
 
 ## System dependencies are found with CMake's conventions
+find_package(ur_kinematics)
 find_package(Boost REQUIRED COMPONENTS system)
 include_directories("/usr/include/python2.7")
 find_package(Eigen3)
@@ -38,7 +40,6 @@ endif()
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -166,8 +167,13 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
+#add_library(ur5_kin src/ur_kin.cpp)
+#set_target_properties(ur5_kin PROPERTIES COMPILE_DEFINITIONS "UR5_PARAMS")
+
+#add_executable(icl_phri_ur5_control bin/ji/test_demo.py)
+#add_library(ur_kinematics src/ur_kin_py.cpp)
+#target_link_libraries(demo
+#   ur5_kin
 # )
 
 #############
@@ -204,7 +210,7 @@ include_directories(
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
-
+catkin_python_setup()
 #############
 ## Testing ##
 #############

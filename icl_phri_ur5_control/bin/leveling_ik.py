@@ -12,7 +12,7 @@ from sensor_msgs.msg import JointState
 from geometry_msgs.msg import WrenchStamped, Vector3
 
 
-from ur_kinematics.ur_kin_py import forward, inverse
+from ur_kin_py import forward, inverse
 
 JOINT_NAMES = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
                'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']

@@ -371,7 +371,7 @@ Visualization Manager:
         base:
           Value: false
         base_link:
-          Value: false
+          Value: true
         ee_link:
           Value: false
         fixed_link:
@@ -382,6 +382,8 @@ Visualization Manager:
           Value: false
         fts_toolside:
           Value: false
+        gripper_com:
+          Value: true
         left_finger_tip:
           Value: false
         left_inner_finger:
@@ -401,7 +403,7 @@ Visualization Manager:
         robotiq_arg2f_base_link:
           Value: false
         robotiq_force_torque_frame_id:
-          Value: false
+          Value: true
         shoulder_link:
           Value: false
         tool:
@@ -441,12 +443,26 @@ Visualization Manager:
                               robotiq_arg2f_base_link:
                                 {}
                             robotiq_force_torque_frame_id:
-                              {}
+                              gripper_com:
+                                {}
                           tool:
                             {}
                         tool0:
                           {}
       Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Arrow Width: 0.5
+      Class: rviz/WrenchStamped
+      Enabled: true
+      Force Arrow Scale: 2
+      Force Color: 204; 51; 51
+      History Length: 1
+      Name: WrenchStamped
+      Topic: /ft_sensor/ft_zeroed
+      Torque Arrow Scale: 2
+      Torque Color: 204; 204; 51
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
@@ -464,7 +480,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.04203081
+      Distance: 2.86890626
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -479,26 +495,26 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.584797025
+      Pitch: 0.619796038
       Target Frame: fixed_link
       Value: XYOrbit (rviz)
-      Yaw: 2.1017735
+      Yaw: 2.4885993
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
-  Height: 1026
+    collapsed: true
+  Height: 1028
   Help:
     collapsed: false
-  Hide Left Dock: false
+  Hide Left Dock: true
   Hide Right Dock: true
   MotionPlanning:
-    collapsed: false
+    collapsed: true
   MotionPlanning - Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002b8000003bcfc0200000007fb000000100044006900730070006c0061007900730100000028000001df000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000020d000001d7000001cc00ffffff00000466000003bc00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002b8000003befc0200000007fb000000100044006900730070006c0061007900730000000028000001df000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb0000002e004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d00200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067000000020d000001d9000001cc00ffffff000003a0000003be00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1828
-  X: 92
+  Width: 928
+  X: 992
   Y: 24
