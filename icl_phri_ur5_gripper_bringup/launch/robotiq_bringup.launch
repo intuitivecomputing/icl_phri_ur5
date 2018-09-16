@@ -1,6 +1,6 @@
 <launch>
-    <arg name="gripper_port" value="/dev/ttyUSB0" />
-    <arg name="sensor_port" value="ttyUSB1" />
+    <arg name="gripper_port" value="/dev/robotiq_gripper" />
+    <arg name="sensor_port" value="robotiq_fts" />
     <arg name="gripper_name" value="gripper_controller" />
 
     <!--gripper bringup-->

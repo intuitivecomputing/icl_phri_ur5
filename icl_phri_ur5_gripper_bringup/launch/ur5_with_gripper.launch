@@ -1,13 +1,13 @@
 <launch>
     <arg name="limited" value="true" />
-    <arg name="gripper_port" value="/dev/ttyUSB1" />
-    <arg name="sensor_port" value="ttyUSB0" />
+    <arg name="gripper_port" value="/dev/robotiq_gripper" />
+    <arg name="sensor_port" value="robotiq_fts" />
     <!-- By default, we do not start a database (it can be large) -->
     <arg name="db" default="true" />
 
     <!--UR5 bringup-->
     <include file="$(find icl_phri_ur5_gripper_bringup)/launch/ur5_bringup.launch">
-        <arg name="robot_ip" value="192.168.1.129" />
+        <arg name="robot_ip" value="192.168.31.191" />
         <arg name="limited" value="$(arg limited)" />
         <arg name="with_gripper" value="true" />
     </include>
