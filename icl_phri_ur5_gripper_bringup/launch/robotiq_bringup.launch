@@ -1,7 +1,7 @@
 <launch>
-    <arg name="gripper_port" value="/dev/robotiq_gripper" />
-    <arg name="sensor_port" value="robotiq_fts" />
-    <arg name="gripper_name" value="gripper_controller" />
+    <arg name="gripper_port" default="/dev/robotiq_gripper" />
+    <arg name="sensor_port" default="robotiq_fts" />
+    <arg name="gripper_name" default="gripper_controller" />
 
     <!--gripper bringup-->
     <node name="gripper_node" pkg="robotiq_c_model_control" type="CModelRtuNode.py" args="$(arg gripper_port)" >
