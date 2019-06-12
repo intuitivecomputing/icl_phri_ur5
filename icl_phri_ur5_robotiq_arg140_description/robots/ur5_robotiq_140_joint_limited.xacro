@@ -4,7 +4,7 @@
   <xacro:include filename="$(find ur_description)/urdf/common.gazebo.xacro" />
   <xacro:include filename="$(find ur_description)/urdf/ur5.urdf.xacro" />
   <xacro:include filename="$(find icl_phri_ur5_robotiq_arg140_description)/urdf/robotiq_arg2f_140_model_macro.xacro" />
-  <xacro:include filename="$(find robotiq_force_torque_sensor)/urdf/robotiq_fts300.urdf.xacro" />
+  <xacro:include filename="$(find robotiq_ft_sensor)/urdf/robotiq_fts150.urdf.xacro" />
   
   <xacro:macro name="ur5_with_gripper_joint_limited" params="prefix">
     <!-- arm -->
