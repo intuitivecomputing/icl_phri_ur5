@@ -7,7 +7,7 @@
 
     <!--UR5 bringup-->
     <include file="$(find icl_phri_ur5_gripper_bringup)/launch/ur5_bringup.launch">
-        <arg name="robot_ip" value="192.168.31.191" />
+        <arg name="robot_ip" value="192.168.1.106" />
         <arg name="limited" value="$(arg limited)" />
         <arg name="with_gripper" value="true" />
     </include>
